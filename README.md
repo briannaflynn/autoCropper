@@ -4,5 +4,6 @@ This python script auto crops images into four quadrants, of equal proportion ba
 
 Requirements:
 
-PIL: from PIL import Image
-open cv2: import cv2
+**PIL: from PIL import Image**
+
+**open cv2: import cv2**
