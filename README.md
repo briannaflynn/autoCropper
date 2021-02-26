@@ -1,1 +1,1 @@
-# openCVautoCropper
+# openCV autoCropper
