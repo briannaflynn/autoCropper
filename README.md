@@ -28,7 +28,7 @@ autoCropper(image_dir, crop_dir, file_dictionary)
 ![](image_dir/RSIP_Example_HipSegmentation.jpg)
 
 ## Example Output Images:
-Produces four roughly even cropped quadrants.
+Produces four cropped quadrants of roughly equal size.
 
 
 ![](crop_dir/RSIP_Example_HipSegmentation2_cropped.jpg). ![](crop_dir/RSIP_Example_HipSegmentation1_cropped.jpg)
