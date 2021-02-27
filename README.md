@@ -7,3 +7,20 @@ Requirements:
 **PIL: from PIL import Image**
 
 **open cv2: import cv2**
+
+################################################################################################################################################
+
+## input image:
+
+![](image_dir/RSIP_Example_HipSegmentation.jpg)
+
+## Example Output Images:
+
+![](crop_dir/RSIP_Example_HipSegmentation1_cropped.jpg)
+
+![](crop_dir/RSIP_Example_HipSegmentation2_cropped.jpg)
+
+![](crop_dir/RSIP_Example_HipSegmentation3_cropped.jpg)
+
+![](crop_dir/RSIP_Example_HipSegmentation4_cropped.jpg)
+
