@@ -16,11 +16,10 @@ ________
 
 ## Example Output Images:
 
-![](crop_dir/RSIP_Example_HipSegmentation1_cropped.jpg)
+![](crop_dir/RSIP_Example_HipSegmentation1_cropped.jpg). ![](crop_dir/RSIP_Example_HipSegmentation2_cropped.jpg)
 
-![](crop_dir/RSIP_Example_HipSegmentation2_cropped.jpg)
 
-![](crop_dir/RSIP_Example_HipSegmentation3_cropped.jpg)
+![](crop_dir/RSIP_Example_HipSegmentation3_cropped.jpg). ![](crop_dir/RSIP_Example_HipSegmentation4_cropped.jpg)
 
-![](crop_dir/RSIP_Example_HipSegmentation4_cropped.jpg)
+
 
