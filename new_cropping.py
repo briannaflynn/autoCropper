@@ -124,16 +124,17 @@ def centroid_finder(matrix):
 
 #given the filepath of an image (in .jpg) and its corresponding mask of ones and zeros,
 #this function crops and stores the image in the same directory
-def cropper(img_path, matrix):
+#where n is half the length of the desired width and height
+def cropper(img_path, matrix, n):
 
     img = cv.imread(img_path)
 
     center_x, center_y = centroid_finder(matrix)
 
-    left_bound = center_x - 100 if (center_x - 100) >= 0 else 0
-    right_bound = center_x + 100 if (center_x + 100) < len(matrix[0]) else (len(matrix[0]) - 1)
-    bottom_bound = center_y + 100 if (center_y + 100) < len(matrix) else len(matrix) - 1
-    top_bound = center_y - 100 if (center_y - 100) >= 0 else 0
+    left_bound = center_x - n if (center_x - n) >= 0 else 0
+    right_bound = center_x + n if (center_x + n) < len(matrix[0]) else (len(matrix[0]) - 1)
+    bottom_bound = center_y + n if (center_y + n) < len(matrix) else len(matrix) - 1
+    top_bound = center_y - n if (center_y - n) >= 0 else 0
 
     cropped_img = img[left_bound:right_bound, top_bound:bottom_bound]
     cropped_path = img_path[0:(len(img_path) - 4)] + "_cropped.jpg"
