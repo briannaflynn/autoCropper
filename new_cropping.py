@@ -5,11 +5,6 @@ import numpy as np
 import json
 import os
 
-#example coordinates of a square
-#top left, bottom left, bottom right, top right
-x = [20, 20, 40, 40]
-y = [20, 40, 40, 20]
-
 #given a filename and vgg formattted json file path from makesense.ai or other image annotation software,
 #this function iterates through the json file and returns the x and y coordinates as lists
 def coordinates_from_json(filename, json_path):
@@ -20,12 +15,6 @@ def coordinates_from_json(filename, json_path):
     y_list = data[filename]['regions']['0']['shape_attributes']['all_points_y']
     return x_list, y_list
 
-"""#the following is stack overflow code to make a matrix of a bunch of zeroes and
-#a square of ones which we designated by the two lists above
-contours = np.stack((x, y), axis = 1)
-polygon = np.array([contours], dtype = np.int32)
-zero_mask = np.zeros((100, 100), np.uint8)
-polyMask = cv.fillPoly(zero_mask, polygon, 1)"""
 
 #the following function takes a filename of an image, a json object containing coordinate information,
 #and a directory (str) in which to store the resulting output, the mask
@@ -43,36 +32,6 @@ def mask_from_file(image_dir, filename, json_path, mask_dir):
     cv.imwrite(mask_dir + '/' + filename[:-4] + '_mask.png', polyMask)
     return polyMask
 
-
-"""#a dictionary of the start and end coordinates
-#a dictionary of the start and end coordinates
-coordinates = dict()
-first_one = False
-
-#iterating through the mask matrix
-for i in range(len(polyMask)):
-    
-    for j in range(len(polyMask[i])):
-
-        #if we've reached the first one, then we can keep track of it in the coordinates dictionary
-        if polyMask[i][j] == 1 and first_one == False:
-            coordinates['start'] = (i, j)
-            first_one = True
-        
-        #keep overwriting the end entry to the coordinate dictionary everytime we see a 1; eventually we will
-        #reach the lsat 1 in the mask
-        if polyMask[i][j] == 1 and first_one == True:
-            coordinates['end'] = (i, j)
-
-#print(coordinates)
-
-
-#print(polyMask)
-#cv.imwrite("newimage.png", polyMask)"""
-
-"""
-The new code starts here onwards that would crop the images
-"""
 #given a 2D matrix of zeroes and ones (matrix) and a column index from 0-(Len(matrix) - 1) (col_index),
 #returns the number of ones in the column, and the starting and ending index of the ones in the column
 def num_ones_in_col(matrix):
@@ -179,7 +138,4 @@ def cropper(image_dir, filename, matrix, n, extension = ".jpg"):
     cropped_path = path[0:(len(path) - 4)] + "_cropped" + extension
 
     cv.imwrite(cropped_path, cropped_img)
-
-#cropper('image_dir', 'S12676_Before_V1.jpg', mask_from_file('image_dir', 'S12676_Before_V1.jpg', 'petrous_bones_kushal_annotations.json', 'mask_dir'), 100)
-
 
