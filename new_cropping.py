@@ -15,6 +15,7 @@ polygon = np.array([contours], dtype = np.int32)
 zero_mask = np.zeros((100, 100), np.uint8)
 polyMask = cv.fillPoly(zero_mask, polygon, 1)
 
+
 #a dictionary of the start and end coordinates
 coordinates = dict()
 first_one = False
@@ -47,7 +48,7 @@ The new code starts here onwards that would crop the images
 #returns the number of ones in the column, and the starting and ending index of the ones in the column
 def num_ones_in_col(matrix, col_index):
     num_ones = 0
-    first_one = FALSE
+    first_one = False
     start_col_index = 0
     end_col_index = 0
     #the integer i represents the number of rows
@@ -55,7 +56,7 @@ def num_ones_in_col(matrix, col_index):
     #column col_index to find the number of ones
     #in the column
     for i in range(len(matrix)):
-        if(matrix[i][col_index] == 1 and first_one == FALSE):
+        if(matrix[i][col_index] == 1 and first_one == False):
             num_ones += 1
             start_col_index = i
             end_col_index = i #we include this line because of the edge case that there is only one number one in a column
@@ -69,7 +70,7 @@ def num_ones_in_col(matrix, col_index):
 #returns the number of ones in the row, and the starting and ending index of the ones in the row
 def num_ones_in_row(matrix, row_index):
     num_ones = 0
-    first_one = FALSE
+    first_one = False
     start_row_index = 0
     end_row_index = 0
     #the integer j represents the number of columns
@@ -125,7 +126,7 @@ def centroid_finder(matrix):
 #given the filepath of an image (in .jpg) and its corresponding mask of ones and zeros,
 #this function crops and stores the image in the same directory
 #where n is half the length of the desired width and height
-def cropper(img_path, matrix, n):
+def cropper(img_path, matrix, n, extension = ".jpg"):
 
     img = cv.imread(img_path)
 
@@ -137,7 +138,7 @@ def cropper(img_path, matrix, n):
     top_bound = center_y - n if (center_y - n) >= 0 else 0
 
     cropped_img = img[left_bound:right_bound, top_bound:bottom_bound]
-    cropped_path = img_path[0:(len(img_path) - 4)] + "_cropped.jpg"
+    cropped_path = img_path[0:(len(img_path) - 4)] + "_cropped" + extension
 
     cv.imwrite(cropped_path, cropped_img)
 
