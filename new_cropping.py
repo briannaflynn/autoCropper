@@ -162,3 +162,32 @@ def cropper(image_dir, filename, matrix, n = None, extension = ".jpg"):
     cropped_path = path[0:(len(path) - 4)] + "_cropped" + extension
 
     cv.imwrite(cropped_path, cropped_img)
+	
+#iterates through files in a folder to create masks (takes files from filepath and json annotations from annotations and places masks in mask_dir)
+def main(filepath, annotations, mask_dir):
+    #cnt = 0
+    for f in os.listdir(filepath):
+        # print(f)
+        #cnt += 1
+        #xList, yList = coordinates_from_json(f, annotations)
+        #print(cnt)
+        mask_from_file(filepath, f, annotations,mask_dir)
+
+#PA - Petrous Annotations
+#TA - Teeth Annotations
+#A - Alaukik
+#K - Kushal
+file_pathAPA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\AlaukiksPA"
+file_pathATA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\AlaukiksTA"
+file_pathKPA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\KushalsPA"
+file_pathKTA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\KushalsTA"
+
+mask_dirAPA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\APA_Mask"
+mask_dirKPA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\KPA_Mask"
+mask_dirATA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\ATA_Mask"
+mask_dirKTA = r"C:\Users\Owner\OneDrive - The University of Texas at Austin\Narasimhan Lab\Bone Image Annotation\KTA_Mask"
+
+main(file_pathAPA, 'PA.json', mask_dirAPA)
+main(file_pathKPA, 'PK.json', mask_dirKPA)
+main(file_pathATA, 'TA.json', mask_dirATA)
+main(file_pathKTA, 'TK.json', mask_dirKTA)
