@@ -138,17 +138,17 @@ def n_finder(matrix, n = 1000, j = 200, k = 400):
 				
 	return new_n
 
-
-
 	
 #given the filepath of an image (in .jpg) and its corresponding mask of ones and zeros,
 #this function crops and stores the image in the same directory
 #where n is half the length of the desired width and height
-def cropper(image_dir, filename, matrix, n, extension = ".jpg"):
+def cropper(image_dir, filename, matrix, n = None, extension = ".jpg"):
 
     path = os.path.abspath(image_dir + '/' + filename)
     img = cv.imread(path)
     
+    n = n_finder(matrix) if n == None else n_finder(matrix, n)
+        
     coords = simpleCentroid(matrix)
 	
     center_x, center_y = coords['x'], coords['y']
@@ -162,97 +162,3 @@ def cropper(image_dir, filename, matrix, n, extension = ".jpg"):
     cropped_path = path[0:(len(path) - 4)] + "_cropped" + extension
 
     cv.imwrite(cropped_path, cropped_img)
-
-
-'''
-#given a 2D matrix of zeroes and ones (matrix) and a column index from 0-(Len(matrix) - 1) (col_index),
-#returns the number of ones in the column, and the starting and ending index of the ones in the column
-def num_ones_in_col(matrix):
-    num_ones = 0
-    col_index = len(matrix[0]) - 1
-    first_one = False
-    start_col_index = 0
-    end_col_index = 0
-    #the integer i represents the number of rows
-    #we're gonna go through the different rows of
-    #column col_index to find the number of ones
-    #in the column
-    for i in range(col_index):
-        if(matrix[i][col_index] == 1 and first_one == False):
-            num_ones += 1
-            start_col_index = i
-            end_col_index = i #we include this line because of the edge case that there is only one number one in a column
-            first_one = True
-        if(matrix[i][col_index] == 1 and first_one == True):
-            num_ones += 1
-            end_col_index = i
-    
-    return num_ones, start_col_index, end_col_index
-
-
-#given a 2D matrix of zeroes and ones (matrix) and a row index from 0-(Len(matrix) - 1) (row_index),
-#returns the number of ones in the row, and the starting and ending index of the ones in the row
-def num_ones_in_row(matrix):
-    num_ones = 0
-    row_index = len(matrix) - 1
-    first_one = False
-    start_row_index = 0
-    end_row_index = 0
-    #the integer j represents the number of columns
-    #we're gonna go through the different columns
-    #row row_index to find the number of ones
-    #in the row
-    #print(matrix[row_index])
-    for j in range(len(matrix[row_index])):
-        if(matrix[row_index][j] == 1 and first_one == False):
-            first_one == True
-            start_row_index = j
-            end_row_index = j # we include this just in case 
-            num_ones += 1
-        if(matrix[row_index][j] == 1 and first_one == True):
-            end_row_index = j
-            num_ones += 1
-    
-    return num_ones, start_row_index, end_row_index
-
-
-#this function gives us the start and end indicies of the column with the most amount of ones
-#for a 2d matrix (matrix) of ones and zeros
-def loc_max_ones_col(matrix):
-    max_num_ones = 0
-    max_start_col_index = 0
-    max_end_col_index = 0
-    for i in range(len(matrix)):
-        current, _, _ = num_ones_in_col(matrix)
-        if(current > max_num_ones):
-            max_num_ones, max_start_col_index, max_end_col_index = num_ones_in_col(matrix)
-    
-    return max_start_col_index, max_end_col_index
-
-#this function gives us the start and end indicies of the row with the most amount of ones
-#for a 2d matrix (matrix) of ones and zeros
-def loc_max_ones_row(matrix):
-    max_num_ones = 0
-    max_start_row_index = 0
-    max_end_row_index = 0
-    for j in range(len(matrix[0])):
-        current, _, _ = num_ones_in_row(matrix)
-        if(current > max_num_ones):
-            max_num_ones, max_start_row_index, max_end_row_index = num_ones_in_row(matrix)
-    
-    return max_start_row_index, max_end_row_index
-
-
-
-#given a matrix of ones and zeros, finds the coordinates of the 
-#center of ones in the matrix
-def centroid_finder(matrix):
-    row_start, row_end = loc_max_ones_row(matrix)
-    col_start, col_end = loc_max_fones_col(matrix)
-
-    centroid_x = (row_start + row_end) // 2
-    centroid_y = (col_start + col_end) // 2
-
-    return centroid_x, centroid_y
-
-'''
