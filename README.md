@@ -8,6 +8,8 @@ Requirements:
 
 **open cv2: import cv2**
 
+**numpy: import numpy as np**
+
 ________
 
 ## Example Input Image:
