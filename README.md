@@ -1,4 +1,4 @@
-# openCV autoCropper
+# autoCropper
 
 This python script auto crops images into four quadrants, of equal proportion based on their height and width dimensions (at the pixel level).
 
