@@ -5,6 +5,15 @@ from PIL import Image
 import numpy as np
 import json
 import os
+import time
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        now = time.time()
+        retval = func(*args, **kwargs)
+        print('{} took {:.5f}s'.format(func.__name__, time.time() - now))
+        return retval
+    return wrapper
 
 #given a filename and vgg formattted json file path from makesense.ai or other image annotation software,
 #this function iterates through the json file and returns the x and y coordinates as lists
@@ -37,7 +46,8 @@ def mask_from_file(image_dir, filename, json_path, mask_dir, n=1):
 # Returns a dictionary containing the start position, and the end position
 # To be used with simpleCentroid function
 
-def get_coordinates(matrix):
+@timeit
+def get_coordinates_old(matrix):
 	
 	coordinates = dict()
 	first_one = False
@@ -56,8 +66,51 @@ def get_coordinates(matrix):
 	
 	return start_end_coordinate_dict
 
-# Find the x and y coordinates of the center of the polygon
-# Returns a dictionary that contains these coordinates
+
+@timeit
+def numpy_centroid(matrix):
+	
+	rows = [i for i in range(len(matrix))] # get a list of indexes for all rows of the matrix
+	
+	columns = [j for j in range(len(matrix[0]))] # get a list of indexes for all columns of the matrix
+	
+	# convert the lists to numpy arrays
+	r = np.array(rows)
+	c = np.array(columns)
+
+	
+	def value_max_width_len(values):
+	
+		j = values[np.fromiter(map(len, values), int).argmax()] # use this to get the longest array from an array of arrays
+		#v = max(map(len, values))
+		return j
+
+	def numpy2centroid(matrix, index_array):
+		
+		mat = index_array * matrix # broadcast the array of indexes to all the arrays of the matrix, multiply together
+		# will get matrix of 0s and the indexes
+		
+		
+		mat = [n[n != 0] for n in mat] # remove all zeros, so now we have a matrix of arrays with either only indexes, or empty arrays
+		# convert the list back into an array
+		matrix = np.array(mat)
+		
+		# x is now the longest array of the matrix (remember, without zeros, the lengths of the index arrays will differ based on the length of the polygon)
+		x = value_max_width_len(matrix)
+		j = x[-1] - x[0] # subtract the last index from the first index
+		
+		center = x[0] + j // 2 # divide the difference between the indexes in half, and add that to first index to find the center
+		
+		return center
+		
+	x_coord = numpy2centroid(matrix, r) # this will give you the x coordinate of the centroid, from our calculations using the row indexes
+	trans_matrix = np.transpose(matrix) # transpose the matrix, so that the columns become the rows, and the rows become the columns
+	y_coord = numpy2centroid(trans_matrix, c) # use the transposed matrix and the column index array to find the y coordinates of the centroid
+	
+	return {'x': x_coord, 'y': y_coord} # returns a dictionary with the x and y coordinates
+		
+
+@timeit
 def simpleCentroid(matrix, start_end_coordinate_dict = None):
 	
 	def coordinates2centroid(start_end_coordinate_dict):
@@ -95,12 +148,15 @@ def simpleCentroid(matrix, start_end_coordinate_dict = None):
 	if start_end_coordinate_dict != None:
 		coords = coordinates2centroid(start_end_coordinate_dict)
 	elif start_end_coordinate_dict == None:
-		start_end_positions = get_coordinates(matrix)
+		start_end_positions = get_coordinates_old(matrix)
 		coords = coordinates2centroid(start_end_positions)
 			
 	return coords
 		
+#TODO: rewrite n_finder using the code for numpy_centroid
+# basically the code as numpy_centroid, instead of get center get the longest values, get the max of x and y longest values, then do lines 189 through 193
 
+@timeit
 def n_finder(matrix, n = 1000, j = 200, k = 400):
 
 	indexer_dict_list = []
