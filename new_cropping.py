@@ -46,26 +46,6 @@ def mask_from_file(image_dir, filename, json_path, mask_dir, n=1):
 # Returns a dictionary containing the start position, and the end position
 # To be used with simpleCentroid function
 
-@timeit
-def get_coordinates_old(matrix):
-	
-	coordinates = dict()
-	first_one = False
-	
-	for i in range(len(matrix)):
-		for j in range(len(matrix[i])):
-		
-			if matrix[i][j] == 1 and first_one == False:
-				coordinates['start'] = (i, j)
-				first_one = True
-			
-			if matrix[i][j] == 1 and first_one == True:
-				coordinates['end'] = (i, j) # i = row, j = column
-			
-	start_end_coordinate_dict = coordinates
-	
-	return start_end_coordinate_dict
-
 
 @timeit
 def numpy_centroid(matrix):
@@ -77,7 +57,6 @@ def numpy_centroid(matrix):
 	# convert the lists to numpy arrays
 	r = np.array(rows)
 	c = np.array(columns)
-
 	
 	def value_max_width_len(values):
 	
@@ -103,56 +82,14 @@ def numpy_centroid(matrix):
 		
 		return center
 		
-	x_coord = numpy2centroid(matrix, r) # this will give you the x coordinate of the centroid, from our calculations using the row indexes
+	x_coord = numpy2centroid(matrix, c) # this will give you the x coordinate of the centroid, from our calculations using the row indexes
 	trans_matrix = np.transpose(matrix) # transpose the matrix, so that the columns become the rows, and the rows become the columns
-	y_coord = numpy2centroid(trans_matrix, c) # use the transposed matrix and the column index array to find the y coordinates of the centroid
+	y_coord = numpy2centroid(trans_matrix, r) # use the transposed matrix and the column index array to find the y coordinates of the centroid
 	
 	return {'x': x_coord, 'y': y_coord} # returns a dictionary with the x and y coordinates
 		
 
-@timeit
-def simpleCentroid(matrix, start_end_coordinate_dict = None):
-	
-	def coordinates2centroid(start_end_coordinate_dict):
-		
-		coords = dict()
-		y = None
-		x = None
-		
-		coordinates = start_end_coordinate_dict
-		
-		if coordinates['end'][0] > coordinates['start'][0]:
-			y = coordinates['end'][0] - coordinates['start'][0]
-			coords['y'] = coordinates['start'][0]
-		elif coordinates['end'][0] < coordinates['start'][0]:
-			y = coordinates['start'][0] - coordinates['end'][0]
-			coords['y'] = coordinates['end'][0]
-			
-		if coordinates['end'][1] > coordinates['start'][1]:
-			x = coordinates['end'][1] - coordinates['start'][1]
-			coords['x'] = coordinates['start'][1]
-		elif coordinates['end'][1] < coordinates['start'][1]:
-			x = coordinates['start'][1] - coordinates['end'][1]
-			coords['x'] = coordinates['end'][1]
-			
-		midy = y // 2
-		midx = x // 2
-		
-		y = coords['y'] + midy
-		x = coords['x'] + midx
-		
-		return ({'x': x, 'y': y})
-	
-	coords = None
-	start_end_positions = None	
-	if start_end_coordinate_dict != None:
-		coords = coordinates2centroid(start_end_coordinate_dict)
-	elif start_end_coordinate_dict == None:
-		start_end_positions = get_coordinates_old(matrix)
-		coords = coordinates2centroid(start_end_positions)
-			
-	return coords
-		
+
 #TODO: rewrite n_finder using the code for numpy_centroid
 # basically the code as numpy_centroid, instead of get center get the longest values, get the max of x and y longest values, then do lines 189 through 193
 
@@ -198,15 +135,16 @@ def n_finder(matrix, n = 1000, j = 200, k = 400):
 #given the filepath of an image (in .jpg) and its corresponding mask of ones and zeros,
 #this function crops and stores the image in the same directory
 #where n is half the length of the desired width and height
-def cropper(image_dir, filename, matrix, n = None, extension = ".jpg"):
+@timeit
+def cropper(image_dir, filename, matrix, n = 1000, extension = ".jpg"):
 
     path = os.path.abspath(image_dir + '/' + filename)
     img = cv.imread(path)
     
-    n = n_finder(matrix) if n == None else n_finder(matrix, n)
-        
-    coords = simpleCentroid(matrix)
-	
+    #n = n_finder(matrix) if n == None else n_finder(matrix, n)
+       
+    coords = numpy_centroid(matrix)
+    print(coords)
     center_x, center_y = coords['x'], coords['y']
 
     left_bound = center_x - n // 2 if (center_x - n // 2) >= 0 else 0
@@ -216,5 +154,5 @@ def cropper(image_dir, filename, matrix, n = None, extension = ".jpg"):
 
     cropped_img = img[top_bound:bottom_bound, left_bound:right_bound]
     cropped_path = path[0:(len(path) - 4)] + "_cropped" + extension
-
+        
     cv.imwrite(cropped_path, cropped_img)
