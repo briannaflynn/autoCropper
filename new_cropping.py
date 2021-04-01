@@ -46,8 +46,7 @@ def mask_from_file(image_dir, filename, json_path, mask_dir, n=1):
 # Returns a dictionary containing the start position, and the end position
 # To be used with simpleCentroid function
 
-
-@timeit
+# @timeit
 def numpy_centroid(matrix):
 	
 	rows = [i for i in range(len(matrix))] # get a list of indexes for all rows of the matrix
@@ -80,79 +79,50 @@ def numpy_centroid(matrix):
 		
 		center = x[0] + j // 2 # divide the difference between the indexes in half, and add that to first index to find the center
 		
-		return center
+		return {"center":center, "max_len":j}
 		
-	x_coord = numpy2centroid(matrix, c) # this will give you the x coordinate of the centroid, from our calculations using the row indexes
+	x = numpy2centroid(matrix, c) # this will give you the x coordinate of the centroid, from our calculations using the row indexes
+	x_coord = x["center"]
+	max_x = x["max_len"]
 	trans_matrix = np.transpose(matrix) # transpose the matrix, so that the columns become the rows, and the rows become the columns
-	y_coord = numpy2centroid(trans_matrix, r) # use the transposed matrix and the column index array to find the y coordinates of the centroid
+	y = numpy2centroid(trans_matrix, r) # use the transposed matrix and the column index array to find the y coordinates of the centroid
+	y_coord = y["center"]
+	max_y = y["max_len"]
 	
-	return {'x': x_coord, 'y': y_coord} # returns a dictionary with the x and y coordinates
+	
+	return {'x': x_coord, 'y': y_coord, 'max_x':max_x, 'max_y':max_y} # returns a dictionary with the x and y coordinates
 		
 
-
-#TODO: rewrite n_finder using the code for numpy_centroid
-# basically the code as numpy_centroid, instead of get center get the longest values, get the max of x and y longest values, then do lines 189 through 193
-
-@timeit
-def n_finder(matrix, n = 1000, j = 200, k = 400):
-
-	indexer_dict_list = []
-	indexer_lengths = []
-	
-	for i in range(len(matrix)):
-		
-		indexer_dict = dict()
-		indexer_list = []
-		
-		for j in range(len(matrix[i])):
-			
-			if matrix[i][j] == 1:
-				indexer_dict[j] = 1
-				indexer_list.append(1)
-				
-		indexer_dict_list.append(indexer_dict)
-		indexer_lengths.append(len(indexer_list))
-		
-	
-	result = dict(functools.reduce(operator.add, map(collections.Counter, indexer_dict_list)))
-	vertical_index = max(result.items(), key=operator.itemgetter(1))[0]
-	
-	vertical_value = result[vertical_index]
-		
-	horizontal_value = max(indexer_lengths)
-		
-	maximum_value = max([vertical_value, horizontal_value])
-		
-	new_n = None
-	if maximum_value >= n:
-		new_n = maximum_value + j
-	elif maximum_value < n:
-		new_n = maximum_value + k
-				
-	return new_n
-
-	
 #given the filepath of an image (in .jpg) and its corresponding mask of ones and zeros,
 #this function crops and stores the image in the same directory
 #where n is half the length of the desired width and height
-@timeit
-def cropper(image_dir, filename, matrix, n = 1000, extension = ".jpg"):
+# @timeit
+def cropper(image_dir, filename, matrix, out_dir = "./", n = 1000, j = 200, k = 400, extension = ".jpg"):
 
     path = os.path.abspath(image_dir + '/' + filename)
     img = cv.imread(path)
-    
-    #n = n_finder(matrix) if n == None else n_finder(matrix, n)
-       
+               
     coords = numpy_centroid(matrix)
     print(coords)
     center_x, center_y = coords['x'], coords['y']
-
+    
+    max_size = max([coords['max_x'], coords['max_y']])
+    
+    # this performs same function as previous n_finder function
+    if max_size >= n:
+    	n = max_size + j
+    elif max_size <= 400:
+    	n = max_size + k
+    else:
+    	pass
+    
     left_bound = center_x - n // 2 if (center_x - n // 2) >= 0 else 0
     right_bound = center_x + n // 2 if (center_x + n) < len(matrix[0]) else (len(matrix[0]) - 1)
     bottom_bound = center_y + n // 2 if (center_y + n) < len(matrix) else len(matrix) - 1
     top_bound = center_y - n // 2 if (center_y - n) >= 0 else 0
 
     cropped_img = img[top_bound:bottom_bound, left_bound:right_bound]
-    cropped_path = path[0:(len(path) - 4)] + "_cropped" + extension
+    cropped_path = out_dir + filename[:-4] + "_cropped" + extension
+    print(cropped_path)
         
     cv.imwrite(cropped_path, cropped_img)
