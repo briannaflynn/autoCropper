@@ -4,6 +4,9 @@ from new_cropping import *
 from PIL import Image
 from tqdm import tqdm 
 import os
+import cv2 as cv
+import time
+import sys
 
 def make_test(m, n, a, b, color=1):
 	
@@ -17,9 +20,6 @@ def make_test(m, n, a, b, color=1):
 	
 	return polyMask
 	
-# height, width
-# example:
-# matrix = make_test(850, 1000, 200, 400)
 
 def assert_dimensions(output_img, n):
 	
@@ -35,40 +35,24 @@ def assert_dimensions(output_img, n):
 		
 	elif size_right == False:
 		print("Error: Output file", output_img, "has incorrect dimensions")
-'''		
-# example demo
-
-file = "S8840_Before_V1.jpg"
-cropped_file = file[:-4] + "_cropped.jpg"
-cd = "."
-
-petrous = mask_from_file(cd, file, "./JSON_annotations/petrous_kushal.json", cd)
-
-# find the desired dimensions for the cropped image size, default is 1000
-n = n_finder(petrous)
-
-cropper(cd, file, petrous, n)	
-
-assert_dimensions(file, n)
-# should print out an error, it's the image before cropping
-assert_dimensions(cropped_file, n)
-# should print out success, using the cropped image as input
-
-'''
-
-matrix = make_test(600, 600, 300, 400)
-
-# get_coordinates_old(matrix)
 
 
-simpleCentroid(matrix)
+masks = "/Users/brie/Desktop/ancientImages/petrousPredictions/"
+inputs = "/Users/brie/Desktop/ancientImages/petrousImages/"
 
-numpy_centroid(matrix)
+fname = "/Users/brie/Desktop/petrous_files.txt"
+with open(fname, "r") as fd:
+    images = fd.read().splitlines()
 
-n_finder(matrix)
-# a = np.arange(3)
-# print(a)
-# b = np.arange(6).reshape(2,3)
-# print(b)
-# for x, y in np.nditer([a,b]):
-#     print("%d:%d" % (x,y), end=' ')
+# images = images[1501:1900]
+   
+for f in images:
+	
+	print(f)
+	file = masks + f[:-4] + "_prediction.png"
+	image = cv.imread(file)
+	img = np.array(image)
+	
+	matrix = img[:,:,1]
+	
+	z = cropper(inputs, f, matrix, out_dir = "/Users/brie/Desktop/ancientImages/croppedOutputs/")
